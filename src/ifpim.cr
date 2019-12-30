@@ -1,6 +1,7 @@
-# TODO: Write documentation for `Ifpim`
-module Ifpim
-  VERSION = "0.1.0"
+require "kemal"
 
-  # TODO: Put your code here
+get "/" do
+  "Hello, world!"
 end
+
+Kemal.run
