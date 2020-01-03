@@ -9,4 +9,17 @@ get "/" do
   layout_render "index"
 end
 
+ws "/ws" do |socket|
+  socket.send "Connected...send a message"
+
+  socket.on_message do |message|
+    puts "received #{message}"
+    socket.send(message.reverse)
+  end
+
+  socket.on_close do
+    puts "socket closed"
+  end
+end
+
 Kemal.run 8013
