@@ -11,14 +11,15 @@ end
 
 ws "/ws" do |socket|
   socket.send "Connected...send a message"
+  puts "socket: #{socket} connected"
 
   socket.on_message do |message|
-    puts "received #{message}"
+    puts "socket #{socket} message: #{message}"
     socket.send(message.reverse)
   end
 
   socket.on_close do
-    puts "socket closed"
+    puts "socket #{socket} closed"
   end
 end
 
