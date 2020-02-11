@@ -5,6 +5,9 @@ class Room
     end
 
     def to_s(io)
-        io << "#{@key}: #{@title}, #{@description}, exits: #{@exits}"
+        io << "#{@key}: #{@title}, #{@description}, exits:"
+        @exits.each do |_,exit|
+            io << "\n  #{exit}"
+        end
     end
 end
