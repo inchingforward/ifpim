@@ -3,30 +3,10 @@ require "./models/*"
 require "db"
 require "pg"
 
-# Render the given template file using the layout template.
-macro layout_render(filename)
-  render "src/views/#{{{filename}}}.ecr", "src/views/layout.ecr"
-end
-
-get "/" do
-  layout_render "index"
-end
-
-ws "/ws" do |socket|
-  socket.send "Connected...send a message"
-  puts "socket: #{socket} connected"
-
-  socket.on_message do |message|
-    puts "socket #{socket} message: #{message}"
-    socket.send(message.reverse)
-  end
-
-  socket.on_close do
-    puts "socket #{socket} closed"
-  end
-end
-
 rooms = {} of String => Room
+socket_room = {} of HTTP::WebSocket => String
+
+puts "Loading rooms..."
 
 DB.connect "postgres://ifpim@localhost:5432/ifpim" do |cnn|
   cnn.query_each "select key, title, description from room" do |rs|
@@ -40,8 +20,42 @@ DB.connect "postgres://ifpim@localhost:5432/ifpim" do |cnn|
   end
 end
 
-rooms.each do |key, val|
-  puts val
+# Render the given template file using the layout template.
+macro layout_render(filename)
+  render "src/views/#{{{filename}}}.ecr", "src/views/layout.ecr"
 end
+
+get "/" do
+  layout_render "index"
+end
+
+ws "/ws" do |socket|
+  puts "socket: #{socket} connected"
+
+  socket_room[socket] = "lobby"
+  socket.send(rooms[socket_room[socket]].as_message)
+  
+  socket.on_message do |message|
+    puts "socket #{socket} message: #{message}"
+    
+    case message
+    when "look", "l"
+      socket.send(rooms[socket_room[socket]].as_message)
+    when "help", "h", "?"
+      socket.send("TODO: help")
+    when "exits", "exit", "ex"
+      socket.send("TODO: list exits")
+    else
+      socket.send("Huh?")
+    end
+  end
+
+  socket.on_close do
+    puts "socket #{socket} closed"
+    socket_room.delete(socket)
+  end
+end
+
+puts "Listening..."
 
 Kemal.run 8013

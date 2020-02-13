@@ -4,8 +4,20 @@ var IFPim = IFPim || (function() {
     var message = document.getElementById("message");
     var display = document.getElementById("response_display");
     
-    btn.addEventListener("click", function() {
+    function sendMessage() {
         ws.send(message.value);
+    }
+    
+    btn.addEventListener("click", function() {
+        sendMessage();
+    });
+
+    message.addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            sendMessage();
+            message.select();
+        }
     });
 
     ws = new WebSocket("ws://localhost:8013/ws");
@@ -14,7 +26,6 @@ var IFPim = IFPim || (function() {
     };
 
     ws.onmessage = function(event) {
-        console.log("received", event);
-        display.innerHTML = event.data;
+        display.innerHTML = display.innerHTML + event.data + "<br /><br />";
     }
 })();
