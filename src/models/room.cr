@@ -4,10 +4,15 @@ class Room
     def initialize(@key : String, @title : String, @description : String)
     end
 
-    def to_s(io)
-        io << "#{@key}: #{@title}, #{@description}, exits:"
-        @exits.each do |_,exit|
-            io << "\n  #{exit}"
+    def as_message()
+        str = String.build do |str|
+            str << "[#{@title}]<br />"
+            str << "#{@description}<br />"
+            str << "Exits: "
+            @exits.each do |_,exit|
+                str << exit.@to_room_label << " "
+            end
         end
+        str
     end
 end
