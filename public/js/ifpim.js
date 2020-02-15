@@ -20,7 +20,8 @@ var IFPim = IFPim || (function() {
         }
     });
 
-    ws = new WebSocket("ws://localhost:8013/ws");
+    var loc = window.location;
+    ws = new WebSocket("ws://" + loc.host + ":8013/ws");
     ws.onopen = function(event) {
         console.log("websocket connected");
     };
