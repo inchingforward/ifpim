@@ -21,7 +21,7 @@ var IFPim = IFPim || (function() {
     });
 
     var loc = window.location;
-    ws = new WebSocket("ws://" + loc.host + ":8013/ws");
+    ws = new WebSocket("ws://" + loc.hostname + ":8013/ws");
     ws.onopen = function(event) {
         console.log("websocket connected");
     };
