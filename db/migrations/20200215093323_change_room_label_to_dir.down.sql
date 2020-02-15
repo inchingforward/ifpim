@@ -1,0 +1,1 @@
+alter table room_exit rename column to_room_dir to to_room_label;

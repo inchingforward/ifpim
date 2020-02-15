@@ -14,9 +14,9 @@ DB.connect "postgres://ifpim@localhost:5432/ifpim" do |cnn|
     rooms[key] = Room.new(key, title, desc)
   end
 
-  cnn.query_each "select from_room_key, to_room_key, to_room_label from room_exit" do |rs|
-    from_room_key, to_room_key, label = rs.read(String, String, String)
-    rooms[from_room_key].@exits[label] = RoomExit.new(from_room_key, to_room_key, label)
+  cnn.query_each "select from_room_key, to_room_key, to_room_dir from room_exit" do |rs|
+    from_room_key, to_room_key, dir = rs.read(String, String, String)
+    rooms[from_room_key].@exits[dir] = RoomExit.new(from_room_key, to_room_key, dir)
   end
 end
 
@@ -37,14 +37,18 @@ ws "/ws" do |socket|
   
   socket.on_message do |message|
     puts "socket #{socket} message: #{message}"
+
+    curr_room = rooms[socket_room[socket]]
     
-    case message
-    when "look", "l"
+    if ["look", "l"].includes?(message)
       socket.send(rooms[socket_room[socket]].as_message)
-    when "help", "h", "?"
+    elsif ["help", "h", "?"].includes?(message)
       socket.send("TODO: help")
-    when "exits", "exit", "ex"
+    elsif ["exits", "exit", "ex"].includes?(message)
       socket.send("TODO: list exits")
+    elsif curr_room.has_exit?(message)
+      socket_room[socket] = curr_room.exit_room(message)
+      socket.send(rooms[socket_room[socket]].as_message)
     else
       socket.send("Huh?")
     end
