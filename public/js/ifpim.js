@@ -28,4 +28,6 @@ var IFPim = IFPim || (function() {
     ws.onmessage = function(event) {
         display.innerHTML = display.innerHTML + event.data + "<br /><br />";
     }
+
+    message.focus();
 })();
