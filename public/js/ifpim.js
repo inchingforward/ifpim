@@ -27,6 +27,7 @@ var IFPim = IFPim || (function() {
 
     ws.onmessage = function(event) {
         display.innerHTML = display.innerHTML + event.data + "<br /><br />";
+        display.scrollTop = display.scrollHeight;
     }
 
     message.focus();
