@@ -1,14 +1,17 @@
 require "kemal"
 require "./models/*"
 require "db"
+require "dotenv"
 require "pg"
 
 rooms = {} of String => Room
 socket_room = {} of HTTP::WebSocket => String
 
+config = Dotenv.load
+
 puts "Loading rooms..."
 
-DB.connect "postgres://ifpim@localhost:5432/ifpim" do |cnn|
+DB.connect config["DB"] do |cnn|
   cnn.query_each "select key, title, description from room" do |rs|
     key, title, desc = rs.read(String, String, String)
     rooms[key] = Room.new(key, title, desc)
