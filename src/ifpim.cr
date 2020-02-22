@@ -3,6 +3,7 @@ require "./models/*"
 require "db"
 require "dotenv"
 require "pg"
+require "./npcs/*"
 
 rooms = {} of String => Room
 socket_room = {} of HTTP::WebSocket => String
@@ -22,6 +23,10 @@ DB.connect config["DB"] do |cnn|
     rooms[from_room_key].@exits[dir] = RoomExit.new(from_room_key, to_room_key, dir)
   end
 end
+
+puts "Loading npcs..."
+
+rooms["lobby"].@npcs << Guardian.new()
 
 # Render the given template file using the layout template.
 macro layout_render(filename)
@@ -53,7 +58,26 @@ ws "/ws" do |socket|
       socket_room[socket] = curr_room.exit_room(message)
       socket.send(rooms[socket_room[socket]].as_message)
     else
-      socket.send("Huh?")
+      # Compound messages
+      parts = message.split(" ")
+      if parts.size > 1
+        if ["look", "l"].includes? parts[0]
+          # Looking at something in the room
+          found = false
+          curr_room.@npcs.each do |npc|
+            if npc.answers_to parts[1]
+              socket.send(npc.look)
+              found = true
+            end
+          end
+
+          if !found
+            socket.send("You don't see that here.")
+          end
+        end
+      else
+        socket.send("Huh?")
+      end
     end
   end
 
