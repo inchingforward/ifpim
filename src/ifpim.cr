@@ -28,6 +28,26 @@ puts "Loading npcs..."
 
 rooms["lobby"].@npcs << Guardian.new()
 
+puts "Starting ticker..."
+spawn do
+  loop do
+    sleep 2.minutes
+    
+    rooms.each do |room_key,room|
+      room.@npcs.each do |npc|
+        message = npc.tick
+        if !message.empty?
+          socket_room.each do |socket, curr_room_key|
+            if room_key == curr_room_key
+              socket.send message
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
 # Render the given template file using the layout template.
 macro layout_render(filename)
   render "src/views/#{{{filename}}}.ecr", "src/views/layout.ecr"

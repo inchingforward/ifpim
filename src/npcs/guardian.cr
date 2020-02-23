@@ -17,4 +17,14 @@ class Guardian < NPC
     def answers_to(adjective : String)
         return @adjectives.includes? adjective.downcase
     end
+
+    def tick
+        [
+            "", "",
+            "The guardian coughs.",
+            "The guardian scratches his nose.",
+            "The guardian scratches his head.",
+            "The guardian eyes you."
+        ].sample(1)[0]
+    end
 end
